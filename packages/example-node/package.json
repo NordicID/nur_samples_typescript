@@ -1,0 +1,19 @@
+{
+  "name": "@nordicid/example-node",
+  "private": true,
+  "version": "0.9.0",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/demo.ts",
+    "demo": "tsx src/demo.ts"
+  },
+  "dependencies": {
+    "@nordicid/nurapi": "file:../../vendor/nordicid-nurapi-0.9.0.tgz",
+    "@nordicid/nurapi-node": "file:../../vendor/nordicid-nurapi-node-0.9.0.tgz"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.5",
+    "tsx": "^4.0.0",
+    "typescript": "^5.5.0"
+  }
+}

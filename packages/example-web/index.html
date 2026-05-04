@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NUR RFID Reader &mdash; Web Demo</title>
+  <!-- CSS loaded via import in main.ts for Vite bundling -->
+</head>
+<body>
+  <!-- Fixed status bar -->
+  <header id="status-bar" class="status-disconnected" role="status" aria-live="polite">
+    <div class="status-left">
+      <span class="status-dot" id="status-dot"></span>
+      <span id="status-text">Disconnected</span>
+    </div>
+    <span id="reader-name" class="reader-name"></span>
+    <span id="browser-notice" class="browser-notice"></span>
+  </header>
+
+  <main>
+    <!-- Connection Panel -->
+    <section class="panel" id="panel-connection">
+      <h2>Connect</h2>
+      <div id="connection-content"></div>
+    </section>
+
+    <!-- Reader Info Panel -->
+    <section class="panel" id="panel-reader-info">
+      <h2>Reader Info</h2>
+      <div id="reader-info-content">
+        <p class="placeholder">Not connected</p>
+      </div>
+    </section>
+
+    <!-- Inventory Panel (full width) -->
+    <section class="panel panel-wide" id="panel-inventory">
+      <h2>Inventory</h2>
+      <div id="inventory-content"></div>
+    </section>
+
+    <!-- Tag Operations Panel -->
+    <section class="panel" id="panel-tag-ops">
+      <h2>Tag Operations</h2>
+      <div id="tag-ops-content">
+        <p class="placeholder">Not connected</p>
+      </div>
+    </section>
+
+    <!-- GPIO Panel -->
+    <section class="panel" id="panel-gpio">
+      <h2>GPIO</h2>
+      <div id="gpio-content">
+        <p class="placeholder">Not connected</p>
+      </div>
+    </section>
+
+    <!-- Event Log Panel (full width) -->
+    <section class="panel panel-wide" id="panel-event-log">
+      <h2>Event Log</h2>
+      <div id="event-log-content"></div>
+    </section>
+  </main>
+
+  <!-- Toast container -->
+  <div id="toast-container"></div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>

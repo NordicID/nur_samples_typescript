@@ -1,0 +1,12 @@
+{
+  "name": "nur-samples-typescript",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "dev:web": "npm run dev -w @nordicid/example-web",
+    "demo:node": "npm run demo -w @nordicid/example-node"
+  }
+}
