@@ -6,7 +6,7 @@ Sample applications for the [`@nordicid/nurapi`](https://nordicid.github.io/nur_
 
 | Package | Description |
 |---|---|
-| **[example-web](packages/example-web)** | Browser app (Chromium) — connects via Web Serial, Web Bluetooth, or WebSocket |
+| **[example-web](packages/example-web)** | Browser app (Chromium) — connects via Web Serial, Web Bluetooth, or WebSocket — [**live demo**](https://nordicid.github.io/nur_samples_typescript/) |
 | **[example-node](packages/example-node)** | Node.js console app — connects via USB serial, TCP, or WebSocket with interactive REPL |
 
 Both samples demonstrate the same core workflow:

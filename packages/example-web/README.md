@@ -2,6 +2,8 @@
 
 Browser demo application for the `@nordicid/nurapi` RFID reader library. Demonstrates all three transports (Web Serial, Web Bluetooth, WebSocket) and core RFID operations using vanilla TypeScript — no framework required.
 
+**Live demo:** https://nordicid.github.io/nur_samples_typescript/
+
 ## Prerequisites
 
 - **Chrome or Edge** (Chromium-based) — Web Serial and Web Bluetooth are not available in Firefox/Safari
