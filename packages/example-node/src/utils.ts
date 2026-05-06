@@ -6,7 +6,7 @@
  */
 
 import * as readline from 'node:readline';
-import { NurApi, bytesToHex } from '@nordicid/nurapi';
+import { NurApi, NurApiError, NurError, bytesToHex } from '@nordicid/nurapi';
 import type {
   TagEntry,
   InventoryStreamEvent,
@@ -78,11 +78,14 @@ export function printTagTable(tags: TagEntry[]): void {
 
 /** Fetch and display reader identification and capabilities. */
 export async function printReaderInfo(api: NurApi): Promise<void> {
-  const [versions, readerInfo, caps] = await Promise.all([
+  const [versions, readerInfo, caps, setup] = await Promise.all([
     api.getVersions(),
     api.getReaderInfo(),
     api.getDeviceCaps(),
+    api.getModuleSetup(),
   ]);
+
+  const regionInfo = await api.getRegionInfo(setup.regionId);
 
   header('Reader Info');
   info('Name', readerInfo.name);
@@ -93,6 +96,7 @@ export async function printReaderInfo(api: NurApi): Promise<void> {
   info('Antennas', `${readerInfo.numAntennas} / ${readerInfo.maxAntennas}`);
   info('GPIO', String(readerInfo.numGpio));
   info('Regions', String(readerInfo.numRegions));
+  info('Region', `${regionInfo.name} (${regionInfo.baseFreq / 1000} MHz, ${regionInfo.channelCount} ch)`);
   info('Max TX', `${caps.maxTxdBm} dBm`);
   info('Tag buffer', `${caps.szTagBuffer} bytes`);
 }
@@ -155,13 +159,21 @@ export async function runDemo(api: NurApi, uri: string): Promise<void> {
 
   // Single inventory
   header('Single Inventory');
-  const result = await api.inventory();
-  const tags = await api.fetchTags(true);
-  console.log(`  Found ${c.bold}${result.tagsFound}${c.reset} tags (${result.roundsDone} rounds, ${result.collisions} collisions, Q=${result.Q})`);
-  printTagTable(tags);
+  try {
+    const result = await api.inventory();
+    const tags = await api.fetchTags(true);
+    console.log(`  Found ${c.bold}${result.tagsFound}${c.reset} tags (${result.roundsDone} rounds, ${result.collisions} collisions, Q=${result.Q})`);
+    printTagTable(tags);
 
-  // Merge into tag storage for the streaming phase
-  api.tagStorage.addFromBuffer(tags);
+    // Merge into tag storage for the streaming phase
+    api.tagStorage.addFromBuffer(tags);
+  } catch (err) {
+    if (err instanceof NurApiError && err.code === NurError.NO_TAG) {
+      console.log(`  ${c.dim}(no tags found)${c.reset}`);
+    } else {
+      throw err;
+    }
+  }
 
   // 5-second streaming inventory
   header('Streaming Inventory (5 seconds)');
@@ -321,6 +333,8 @@ export async function runInteractive(api: NurApi, uri: string): Promise<void> {
     process.exit(1);
   }
 
+  console.log(`Type ${c.cyan}help${c.reset} for available commands.\n`);
+
   rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout,
@@ -414,6 +428,18 @@ export async function runInteractive(api: NurApi, uri: string): Promise<void> {
           console.log(`EPC: ${formatEpc(tag.epcHex)}  RSSI: ${tag.rssi} dBm (${tag.scaledRssi}%)  ant=${tag.antennaId}`);
           break;
         }
+        case 'setup': {
+          const setup = await api.getModuleSetup();
+          const rfProfileNames = ['Robust', 'Nominal', 'High Speed', 'High Speed 2', 'Fast', 'AutoSet'];
+          header('Module Setup');
+          info('RF profile', rfProfileNames[setup.rfProfile] ?? String(setup.rfProfile));
+          info('Antenna', setup.selectedAntenna === -1 ? 'auto' : String(setup.selectedAntenna));
+          info('Inventory Q', setup.inventoryQ === 0 ? 'auto' : String(setup.inventoryQ));
+          info('Inventory session', String(setup.inventorySession));
+          info('Inventory target', String(setup.inventoryTarget));
+          info('Inventory rounds', setup.inventoryRounds === 0 ? 'auto' : String(setup.inventoryRounds));
+          break;
+        }
         case 'beep':
           await api.beep();
           console.log(`${c.green}Beep!${c.reset}`);
@@ -430,6 +456,7 @@ ${c.bold}Available commands:${c.reset}
   ${c.cyan}clear${c.reset}                          Clear tag storage
   ${c.cyan}read${c.reset} <bank> <addr> <words>     Read tag memory
   ${c.cyan}scan${c.reset} [timeout]                 Scan for single tag
+  ${c.cyan}setup${c.reset}                          Show module setup
   ${c.cyan}beep${c.reset}                           Beep the reader
   ${c.cyan}help${c.reset}                           Show this help
   ${c.cyan}quit${c.reset} / ${c.cyan}exit${c.reset}                    Disconnect and exit

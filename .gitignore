@@ -5,12 +5,13 @@ node_modules/
 dist/
 *.tsbuildinfo
 
-# IDE
+# IDE / agent tools
 .idea/
 .vscode/
 .claude/
 .omc/
 .local/
+.playwright-mcp/
 
 # OS
 .DS_Store

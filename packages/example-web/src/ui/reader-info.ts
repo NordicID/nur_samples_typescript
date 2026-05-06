@@ -2,44 +2,73 @@
  * Reader Info panel — displays reader identification, firmware, and capabilities.
  *
  * Populates `#reader-info-content` on `connected` events by fetching version,
- * reader info, and device capabilities. Provides Ping, Beep, and Refresh
- * action buttons.
+ * reader info, and device capabilities. Shows a header with the reader name,
+ * serial, and the active transport, then groups remaining fields into
+ * Firmware and Capability sections. Provides Ping, Beep, and Refresh actions.
  */
 
-import { getApi } from '../state.js';
+import { getApi, getConnectionUri } from '../state.js';
 import { $, el, btn } from '../helpers.js';
 import { showToast } from './toast.js';
 import type { VersionInfo, ReaderInfo, DeviceCaps } from '@nordicid/nurapi';
+
+interface TransportInfo {
+  type: 'serial' | 'bluetooth' | 'websocket' | 'unknown';
+  label: string;
+  detail: string;
+}
+
+function describeTransport(uri: string | null): TransportInfo {
+  if (!uri) return { type: 'unknown', label: 'Connected', detail: '' };
+  if (uri.startsWith('ser://')) {
+    let baud = '';
+    try {
+      const u = new URL(uri);
+      const b = u.searchParams.get('baudrate');
+      if (b) baud = `${b} baud`;
+    } catch {
+      /* ignore */
+    }
+    return { type: 'serial', label: 'Web Serial', detail: baud };
+  }
+  if (uri.startsWith('ble://')) {
+    return { type: 'bluetooth', label: 'Web Bluetooth', detail: '' };
+  }
+  if (uri.startsWith('ws://') || uri.startsWith('wss://')) {
+    try {
+      const u = new URL(uri);
+      const scheme = u.protocol.replace(':', '');
+      return {
+        type: 'websocket',
+        label: `WebSocket (${scheme})`,
+        detail: `${u.hostname}${u.pathname}`,
+      };
+    } catch {
+      return { type: 'websocket', label: 'WebSocket', detail: '' };
+    }
+  }
+  return { type: 'unknown', label: 'Connected', detail: '' };
+}
 
 export function initReaderInfoPanel(): void {
   const container = $('#reader-info-content');
   const api = getApi();
 
-  // ---------------------------------------------------------------------------
-  // Event handlers
-  // ---------------------------------------------------------------------------
-
   api.on('connected', () => {
+    container.style.display = '';
     loadInfo();
   });
 
   api.on('disconnected', () => {
+    container.style.display = 'none';
     container.innerHTML = '';
-    const placeholder = el('p', 'placeholder', 'Not connected');
-    container.appendChild(placeholder);
   });
 
-  // Show placeholder initially
-  const placeholder = el('p', 'placeholder', 'Not connected');
-  container.appendChild(placeholder);
-
-  // ---------------------------------------------------------------------------
-  // Data loading
-  // ---------------------------------------------------------------------------
+  container.style.display = 'none';
 
   async function loadInfo(): Promise<void> {
     container.innerHTML = '';
-    const loading = el('p', 'placeholder', 'Loading...');
+    const loading = el('p', 'placeholder', 'Loading reader info…');
     container.appendChild(loading);
 
     try {
@@ -50,45 +79,86 @@ export function initReaderInfoPanel(): void {
       ]);
 
       container.innerHTML = '';
-      container.appendChild(buildInfoGrid(versions, info, caps));
+      const transport = describeTransport(getConnectionUri());
+      container.appendChild(buildHeader(info, transport));
+      container.appendChild(buildSections(versions, info, caps));
       container.appendChild(buildActions());
     } catch (err) {
       container.innerHTML = '';
-      const errMsg = el('p', 'placeholder', 'Failed to load reader info');
-      container.appendChild(errMsg);
+      container.appendChild(el('p', 'placeholder', 'Failed to load reader info'));
       showToast(err instanceof Error ? err.message : String(err), 'error');
     }
   }
 
-  // ---------------------------------------------------------------------------
-  // Info grid
-  // ---------------------------------------------------------------------------
+  function buildHeader(info: ReaderInfo, transport: TransportInfo): HTMLDivElement {
+    const header = el('div', 'reader-header') as HTMLDivElement;
 
-  function buildInfoGrid(
+    const ident = el('div', 'reader-ident') as HTMLDivElement;
+    const nameEl = el('div', 'reader-name-big', info.name || '(unnamed reader)');
+    const serialEl = el(
+      'div',
+      'reader-meta',
+      info.serial ? `Serial ${info.serial}` : '',
+    );
+    ident.appendChild(nameEl);
+    if (info.serial) ident.appendChild(serialEl);
+
+    const badge = el(
+      'span',
+      `transport-badge transport-badge-${transport.type}`,
+      transport.label,
+    ) as HTMLSpanElement;
+    badge.title = transport.detail || transport.label;
+
+    const right = el('div', 'reader-header-right') as HTMLDivElement;
+    right.appendChild(badge);
+    if (transport.detail) {
+      right.appendChild(el('div', 'reader-header-detail', transport.detail));
+    }
+
+    header.appendChild(ident);
+    header.appendChild(right);
+    return header;
+  }
+
+  function buildSections(
     versions: VersionInfo,
     info: ReaderInfo,
     caps: DeviceCaps,
-  ): HTMLDListElement {
-    const dl = document.createElement('dl');
-    dl.className = 'info-grid';
+  ): HTMLDivElement {
+    const wrap = el('div', 'reader-info-sections') as HTMLDivElement;
 
     const modeChar = String.fromCharCode(versions.mode);
-    const modeLabel = modeChar === 'A' ? 'A=App' : modeChar === 'B' ? 'B=Bootloader' : modeChar;
+    const modeLabel =
+      modeChar === 'A' ? 'Application' : modeChar === 'B' ? 'Bootloader' : modeChar;
 
-    const fields: [string, string][] = [
-      ['Name', info.name],
-      ['Serial', info.serial],
-      ['Firmware', `${versions.vMajor}.${versions.vMinor}.${versions.vBuild}`],
-      ['Mode', modeLabel],
-      ['Hardware', info.hwVersion],
-      ['Antennas', `${info.numAntennas} / ${info.maxAntennas}`],
-      ['GPIO', String(info.numGpio)],
-      ['Regions', String(info.numRegions)],
-      ['Max TX', `${caps.maxTxdBm} dBm`],
-      ['Tag Buffer', `${caps.szTagBuffer} bytes`],
-    ];
+    wrap.appendChild(
+      buildSection('Firmware', [
+        ['Version', `${versions.vMajor}.${versions.vMinor}.${versions.vBuild}`],
+        ['Mode', modeLabel],
+        ['Hardware', info.hwVersion || '—'],
+      ]),
+    );
 
-    for (const [label, value] of fields) {
+    wrap.appendChild(
+      buildSection('Capabilities', [
+        ['Antennas', `${info.numAntennas} / ${info.maxAntennas}`],
+        ['GPIO pins', String(info.numGpio)],
+        ['Regions', String(info.numRegions)],
+        ['Max TX power', `${caps.maxTxdBm} dBm`],
+        ['Tag buffer', `${caps.szTagBuffer} bytes`],
+      ]),
+    );
+
+    return wrap;
+  }
+
+  function buildSection(title: string, rows: [string, string][]): HTMLDivElement {
+    const section = el('div', 'reader-info-section') as HTMLDivElement;
+    section.appendChild(el('h4', 'reader-info-section-title', title));
+    const dl = document.createElement('dl');
+    dl.className = 'info-grid';
+    for (const [label, value] of rows) {
       const dt = document.createElement('dt');
       dt.textContent = label;
       const dd = document.createElement('dd');
@@ -96,20 +166,14 @@ export function initReaderInfoPanel(): void {
       dl.appendChild(dt);
       dl.appendChild(dd);
     }
-
-    return dl;
+    section.appendChild(dl);
+    return section;
   }
 
-  // ---------------------------------------------------------------------------
-  // Action buttons
-  // ---------------------------------------------------------------------------
-
   function buildActions(): HTMLDivElement {
-    const actions = document.createElement('div');
-    actions.className = 'info-actions';
+    const actions = el('div', 'info-actions') as HTMLDivElement;
 
-    const pingResult = document.createElement('span');
-    pingResult.className = 'ping-result';
+    const pingResult = el('span', 'ping-result', '') as HTMLSpanElement;
 
     const pingBtn = btn('Ping', 'btn-sm', async () => {
       try {

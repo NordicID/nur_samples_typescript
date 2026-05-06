@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@nordicid/nurapi": "file:../../vendor/nordicid-nurapi-0.9.0.tgz",
-    "@nordicid/nurapi-web": "file:../../vendor/nordicid-nurapi-web-0.9.0.tgz"
+    "@nordicid/nurapi": "file:../../nurapi/nordicid-nurapi-0.9.3.tgz",
+    "@nordicid/nurapi-web": "file:../../nurapi/nordicid-nurapi-web-0.9.3.tgz"
   },
   "devDependencies": {
     "typescript": "^5.5.0",

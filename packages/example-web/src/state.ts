@@ -8,6 +8,7 @@
 import type { NurApi } from '@nordicid/nurapi';
 
 let api: NurApi | null = null;
+let connectionUri: string | null = null;
 
 /** Store the NurApi instance (called once from main.ts). */
 export function setApi(instance: NurApi): void {
@@ -18,4 +19,12 @@ export function setApi(instance: NurApi): void {
 export function getApi(): NurApi {
   if (!api) throw new Error('App not initialized — call setApi() first');
   return api;
+}
+
+export function setConnectionUri(uri: string | null): void {
+  connectionUri = uri;
+}
+
+export function getConnectionUri(): string | null {
+  return connectionUri;
 }

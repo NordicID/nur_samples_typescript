@@ -165,6 +165,10 @@ button:disabled { opacity: 0.4; cursor: not-allowed; }
   color: #fff;
   border-color: var(--color-success);
 }
+.btn-success:hover:not(:disabled) {
+  background: #2e9249;
+  border-color: #2e9249;
+}
 
 .btn-sm { padding: 4px 10px; font-size: 12px; }
 
@@ -215,23 +219,51 @@ label {
   font-weight: 500;
 }
 
-/* --- Connection Panel --- */
+/* --- Connection + Reader Info (combined panel) --- */
+#connection-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "serial bluetooth"
+    "websocket websocket";
+  gap: 12px;
+}
+
+#connection-content .transport-section.serial { grid-area: serial; }
+#connection-content .transport-section.bluetooth { grid-area: bluetooth; }
+#connection-content .transport-section.websocket { grid-area: websocket; }
+
+#connection-content .btn-danger {
+  grid-column: 1 / -1;
+}
+
 .transport-section {
-  margin-bottom: 12px;
-  padding: 10px;
+  padding: 12px 14px;
   border: 1px solid var(--color-border);
   border-radius: var(--radius-sm);
+  margin: 0;
+  background: #fcfcfd;
 }
 
 .transport-section h3 {
   font-size: 13px;
   font-weight: 600;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
 }
 
 .transport-section.serial { border-left: 3px solid var(--color-serial); }
 .transport-section.bluetooth { border-left: 3px solid var(--color-ble); }
 .transport-section.websocket { border-left: 3px solid var(--color-ws); }
+
+.transport-section .form-row:last-child {
+  margin-bottom: 0;
+}
+
+.transport-help {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-bottom: 10px;
+}
 
 .transport-unsupported {
   color: var(--color-text-muted);
@@ -239,7 +271,191 @@ label {
   font-style: italic;
 }
 
+.required-star {
+  color: var(--color-danger);
+  margin-left: 2px;
+  font-weight: 700;
+}
+
+.input-with-action {
+  display: flex;
+  gap: 0;
+  align-items: stretch;
+}
+
+.input-with-action input {
+  flex: 1;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right: none;
+}
+
+.btn-icon {
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: #f5f5f5;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  min-width: 48px;
+  justify-content: center;
+}
+
+.btn-icon:hover:not(:disabled) {
+  background: #ececec;
+}
+
+/* WebSocket form */
+.ws-form-grid {
+  display: grid;
+  grid-template-columns: minmax(140px, 1fr) minmax(140px, 1fr) minmax(260px, 2fr);
+  gap: 10px 12px;
+  align-items: start;
+  margin-bottom: 10px;
+}
+
+.ws-form-grid .form-group {
+  min-width: 0;
+}
+
+.ws-form-grid .form-group input {
+  width: 100%;
+}
+
+.ws-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.ws-error-box {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: #fef5f3;
+  border: 1px solid rgba(234, 67, 53, 0.3);
+  border-left: 3px solid var(--color-danger);
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  color: var(--color-text);
+}
+
+.ws-error-title {
+  font-weight: 600;
+  color: var(--color-danger);
+  margin-bottom: 4px;
+}
+
+.ws-error-detail {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-bottom: 8px;
+  word-break: break-word;
+}
+
+.ws-error-hint {
+  line-height: 1.5;
+}
+
+.ws-error-hint a {
+  color: var(--color-primary);
+  word-break: break-all;
+}
+
+.ws-error-hint a:hover {
+  text-decoration: underline;
+}
+
 /* --- Reader Info --- */
+.reader-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.reader-ident {
+  min-width: 0;
+}
+
+.reader-name-big {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text);
+  word-break: break-all;
+}
+
+.reader-meta {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  margin-top: 2px;
+}
+
+.reader-header-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.transport-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  border: 1px solid transparent;
+  background: #eee;
+  color: #555;
+}
+
+.transport-badge-serial {
+  background: rgba(26, 115, 232, 0.1);
+  color: var(--color-serial);
+  border-color: rgba(26, 115, 232, 0.3);
+}
+
+.transport-badge-bluetooth {
+  background: rgba(103, 58, 183, 0.1);
+  color: var(--color-ble);
+  border-color: rgba(103, 58, 183, 0.3);
+}
+
+.transport-badge-websocket {
+  background: rgba(0, 151, 167, 0.1);
+  color: var(--color-ws);
+  border-color: rgba(0, 151, 167, 0.3);
+}
+
+.reader-header-detail {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+}
+
+.reader-info-sections {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 24px;
+}
+
+.reader-info-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
 .info-grid {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -259,7 +475,9 @@ label {
 }
 
 .info-actions {
-  margin-top: 12px;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--color-border);
   display: flex;
   gap: 8px;
   align-items: center;
@@ -348,9 +566,10 @@ label {
 }
 
 .rssi-bar-fill {
+  display: block;
   height: 100%;
   background: var(--color-success);
-  transition: width 0.2s;
+  transition: width 0.2s, background 0.2s;
 }
 
 /* --- Tag Operations --- */
@@ -496,6 +715,15 @@ label {
 }
 
 /* --- Responsive --- */
+@media (max-width: 900px) {
+  .ws-form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .ws-form-grid .form-group:last-child {
+    grid-column: 1 / -1;
+  }
+}
+
 @media (max-width: 768px) {
   main {
     grid-template-columns: 1fr;
@@ -503,6 +731,31 @@ label {
 
   .panel-wide {
     grid-column: 1;
+  }
+
+  #connection-content {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "serial"
+      "bluetooth"
+      "websocket";
+  }
+
+  .ws-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .reader-info-sections {
+    grid-template-columns: 1fr;
+  }
+
+  .reader-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .reader-header-right {
+    align-items: flex-start;
   }
 
   .inv-controls {

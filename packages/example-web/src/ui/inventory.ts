@@ -11,6 +11,13 @@ import { $, el, btn, timeAgo } from '../helpers.js';
 import { showToast } from './toast.js';
 import type { InventoryStreamEvent } from '@nordicid/nurapi';
 
+/** Return a CSS color for a scaled RSSI percentage (0–100). */
+function rssiColor(pct: number): string {
+  if (pct >= 66) return '#34a853'; // green
+  if (pct >= 33) return '#f9ab00'; // yellow
+  return '#ea4335';                // red
+}
+
 export function initInventoryPanel(): void {
   const container = $('#inventory-content');
   const api = getApi();
@@ -279,6 +286,7 @@ export function initInventoryPanel(): void {
         const barFill = cells[3].querySelector('.rssi-bar-fill') as HTMLElement;
         if (barFill) {
           barFill.style.width = `${tag.scaledRssi}%`;
+          barFill.style.background = rssiColor(tag.scaledRssi);
         }
         const barText = cells[3].lastChild;
         if (barText && barText.nodeType === Node.TEXT_NODE) {
@@ -314,6 +322,7 @@ export function initInventoryPanel(): void {
         const barInner = document.createElement('span');
         barInner.className = 'rssi-bar-fill';
         barInner.style.width = `${tag.scaledRssi}%`;
+        barInner.style.background = rssiColor(tag.scaledRssi);
         barOuter.appendChild(barInner);
         tdSignal.appendChild(barOuter);
         tdSignal.appendChild(document.createTextNode(` ${tag.scaledRssi}%`));

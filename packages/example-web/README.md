@@ -10,11 +10,11 @@ Browser demo application for the `@nordicid/nurapi` RFID reader library. Demonst
 
 ## Quick Start
 
-From the monorepo root:
+From the repo root:
 
 ```bash
 npm install
-npm run dev --workspace=packages/example-web
+npm run dev:web
 ```
 
 Or from this directory:
@@ -128,7 +128,7 @@ src/
 ├── main.ts             Entry point: create NurApi, wire status bar, init panels
 ├── state.ts            Shared NurApi instance accessor
 ├── helpers.ts          DOM utilities, hex formatting, time helpers
-├── style.css           All styles (~515 lines): CSS grid, variables, responsive
+├── style.css           All styles: CSS grid layout, variables, responsive
 └── ui/
     ├── connection.ts   Transport selection and disconnect
     ├── reader-info.ts  Reader identification and capabilities

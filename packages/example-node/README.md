@@ -9,34 +9,38 @@ Node.js console demo for the `@nordicid/nurapi` RFID reader library. Supports de
 
 ## Quick Start
 
-From the monorepo root:
+Install dependencies once from the repo root:
 
 ```bash
 npm install
 ```
 
-Then run the demo:
+Run from the **repo root** using workspace scripts:
 
 ```bash
 # Discover readers automatically
-npx tsx src/demo.ts
+npm run demo:node
 
 # Connect directly with a URI
-npx tsx src/demo.ts ser://COM3
-npx tsx src/demo.ts tcp://192.168.1.100:4333
-npx tsx src/demo.ts wss://192.168.1.100/wsp/4333
+npm run demo:node -- ser://COM3
+npm run demo:node -- tcp://192.168.1.100:4333
+npm run demo:node -- wss://192.168.1.100/wsp/4333
 
 # Interactive REPL mode
-npx tsx src/demo.ts ser://COM3 -i
-npx tsx src/demo.ts tcp://192.168.1.100 --interactive
+npm run demo:node:i -- ser://COM3
+npm run demo:node:i -- tcp://192.168.1.100
 ```
 
-Or use npm scripts:
+Or from **inside this package** (`packages/example-node/`):
 
 ```bash
-npm start
-npm start -- ser://COM3
-npm start -- tcp://192.168.1.100 -i
+npm start                              # discover
+npm start -- ser://COM3                # connect & run demo
+npm start -- tcp://192.168.1.100 -i    # interactive REPL
+
+# Or invoke tsx directly
+npx tsx src/demo.ts ser://COM3
+npx tsx src/demo.ts tcp://192.168.1.100 -i
 ```
 
 ## Usage
@@ -83,6 +87,7 @@ Full command-line interface for ad-hoc reader operations.
 | `clear` | Clear tag storage |
 | `read <bank> <addr> <words> [epc]` | Read tag memory |
 | `scan [timeout]` | Scan for single tag |
+| `setup` | Show module setup (RF profile, antenna, Q, session, target, rounds) |
 | `beep` | Beep the reader |
 | `help` | Show commands |
 | `quit` / `exit` | Disconnect and exit |
