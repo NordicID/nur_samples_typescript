@@ -1,7 +1,6 @@
 ---
 description: "Update @nordicid/nurapi, @nordicid/nurapi-web, and @nordicid/nurapi-node packages and API docs to the latest version from the Nordic ID release site"
 agent: "agent"
-tools: ["fetch", "terminal", "editFiles"]
 ---
 
 # Update NurApi Dependencies
@@ -18,15 +17,18 @@ All releases and docs are published at: https://nordicid.github.io/nur_nurapi_ty
 
 Read `packages/example-web/package.json` and `packages/example-node/package.json` and note the current `.tgz` filenames and versions in the `dependencies` section (look for `file:../../nurapi/` entries).
 
-### 2. Fetch the release page
+### 2. Fetch the latest version
 
-Fetch https://nordicid.github.io/nur_nurapi_typescript/ and identify:
-- The latest `nordicid-nurapi-*.tgz` download URL
-- The latest `nordicid-nurapi-web-*.tgz` download URL
-- The latest `nordicid-nurapi-node-*.tgz` download URL
-- The version number from the release label
+Use `curl` to download https://nordicid.github.io/nur_nurapi_typescript/releases.json (the HTML page loads versions dynamically via JS, so fetch the JSON directly). It returns:
 
-If the version on the site matches what's already in the package.json files, report "already up to date" and stop.
+```json
+{ "tag": "v0.1.0", "files": [{ "name": "nordicid-nurapi-0.1.0.tgz", "size": 0 }, ...] }
+```
+
+Extract the version number (strip the `v` prefix from `tag`) and build download URLs as:
+`https://nordicid.github.io/nur_nurapi_typescript/releases/<filename>`
+
+If the version matches what's already in the package.json files, report "already up to date" and stop.
 
 ### 3. Download new packages
 

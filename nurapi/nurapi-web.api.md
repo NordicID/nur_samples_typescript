@@ -1,7 +1,7 @@
 # @nordicid/nurapi-web — API Reference
 
-> Generated: 2026-05-05 21:12:34 UTC  
-> Package version: `0.9.3`  
+> Generated: 2026-05-06 07:35:25 UTC  
+> Package version: `0.9.4`  
 > Source: TypeDoc
 
 Browser transports for the `@nordicid/nurapi` library — Web Serial and Web Bluetooth.
