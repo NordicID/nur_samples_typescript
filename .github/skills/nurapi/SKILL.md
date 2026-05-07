@@ -17,7 +17,7 @@ Reference skill for working with `@nordicid/nurapi`, `@nordicid/nurapi-web`, and
 
 ## Quick Reference
 
-Full API docs: [nurapi/nurapi.api.md](../../../nurapi/nurapi.api.md), [nurapi/nurapi-web.api.md](../../../nurapi/nurapi-web.api.md), and [nurapi/nurapi-node.api.md](../../../nurapi/nurapi-node.api.md). Consult these for complete type signatures, enums, and advanced features.
+Full API docs: [docs/nurapi.api.md](../../../docs/nurapi.api.md), [docs/nurapi-web.api.md](../../../docs/nurapi-web.api.md), and [docs/nurapi-node.api.md](../../../docs/nurapi-node.api.md). Consult these for complete type signatures, enums, and advanced features.
 
 Online docs: https://nordicid.github.io/nur_nurapi_typescript/
 
@@ -28,7 +28,7 @@ This is a **monorepo** with two sample packages:
 - **example-web**: Browser transports (`@nordicid/nurapi-web`) — Web Serial, Web Bluetooth
 - **example-node**: Node.js transports (`@nordicid/nurapi-node`) — serialport, TCP
 
-Packages are local `.tgz` in `nurapi/` at the repo root.
+Packages are installed from npm (`latest`). API docs are in `docs/` at the repo root.
 
 ### Web (browser)
 

@@ -1,15 +1,15 @@
 {
   "name": "@nordicid/example-node",
   "private": true,
-  "version": "0.9.4",
+  "version": "0.9.7",
   "type": "module",
   "scripts": {
     "start": "tsx src/demo.ts",
     "demo": "tsx src/demo.ts"
   },
   "dependencies": {
-    "@nordicid/nurapi": "file:../../nurapi/nordicid-nurapi-0.9.4.tgz",
-    "@nordicid/nurapi-node": "file:../../nurapi/nordicid-nurapi-node-0.9.4.tgz"
+    "@nordicid/nurapi": "latest",
+    "@nordicid/nurapi-node": "latest"
   },
   "devDependencies": {
     "@types/node": "^25.3.5",

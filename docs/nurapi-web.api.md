@@ -1,7 +1,7 @@
 # @nordicid/nurapi-web — API Reference
 
-> Generated: 2026-05-06 07:35:25 UTC  
-> Package version: `0.9.4`  
+> Generated: 2026-05-07 14:53:30 UTC  
+> Package version: `0.9.7`  
 > Source: TypeDoc
 
 Browser transports for the `@nordicid/nurapi` library — Web Serial and Web Bluetooth.
@@ -134,6 +134,64 @@ attempts.
 ## API Reference
 
 ### @nordicid/nurapi-web
+
+Browser transports for the [`@nordicid/nurapi`](https://www.npmjs.com/package/@nordicid/nurapi) library — Web Serial and Web Bluetooth.
+
+#### Install
+
+```bash
+npm install @nordicid/nurapi @nordicid/nurapi-web
+```
+
+#### Quick Start
+
+Import the package to register `ser://` and `ble://` URI schemes automatically:
+
+```typescript
+import '@nordicid/nurapi-web';
+import { NurApi } from '@nordicid/nurapi';
+
+const reader = new NurApi();
+
+// Must be called from a user gesture (click/tap handler)
+await reader.connect('ser://request'); // Web Serial port picker
+// await reader.connect('ble://request'); // Web Bluetooth device picker
+```
+
+#### Browser Requirements
+
+- **Chromium-only** — Chrome, Edge, Opera. Firefox and Safari do not support Web Serial or Web Bluetooth.
+- **User gesture required** — `ser://request` and `ble://request` must be called from a click/tap handler.
+- **Secure context (HTTPS)** — Web Serial and Web Bluetooth require HTTPS or `localhost`.
+
+#### Feature Detection
+
+```typescript
+import { isWebSerialSupported, isWebBluetoothSupported } from '@nordicid/nurapi-web';
+
+if (isWebSerialSupported()) {
+  await reader.connect('ser://request');
+}
+
+if (isWebBluetoothSupported()) {
+  await reader.connect('ble://request');
+}
+```
+
+#### Transport Registration
+
+| Scheme | Browser API | Registered when |
+|---|---|---|
+| `ser://` | `navigator.serial` | Web Serial API available |
+| `ble://` | `navigator.bluetooth` | Web Bluetooth API available |
+
+#### Documentation
+
+See the full API reference and guides at [nordicid.github.io/nur_nurapi_typescript](https://nordicid.github.io/nur_nurapi_typescript/).
+
+#### License
+
+See [LICENSE](https://nordicid.github.io/nur_nurapi_typescript/LICENSE).
 
 #### Utility
 

@@ -20,7 +20,7 @@ No test framework. No linter. TypeScript strict mode is the primary safety net.
 - **example-node**: Console app with interactive REPL, runs via `tsx`
 - **State**: Pure getter/setter module in `src/state.ts` — no reactivity
 - **NurApi singleton**: Created once in entry point, stored via `setApi()`/`getApi()`
-- **API docs**: See [nurapi/nurapi.api.md](nurapi/nurapi.api.md), [nurapi/nurapi-web.api.md](nurapi/nurapi-web.api.md), and [nurapi/nurapi-node.api.md](nurapi/nurapi-node.api.md)
+- **API docs**: See [docs/nurapi.api.md](docs/nurapi.api.md), [docs/nurapi-web.api.md](docs/nurapi-web.api.md), and [docs/nurapi-node.api.md](docs/nurapi-node.api.md)
 
 ## Code Style
 
@@ -68,5 +68,5 @@ Each panel lives in `src/ui/<name>.ts` and follows this structure:
 
 ## Dependencies
 
-- `@nordicid/nurapi` + `@nordicid/nurapi-web` + `@nordicid/nurapi-node` — local `.tgz` in `nurapi/`
-- API docs and upgrade instructions: https://nordicid.github.io/nur_nurapi_typescript/
+- `@nordicid/nurapi` + `@nordicid/nurapi-web` + `@nordicid/nurapi-node` — from npm registry (`latest`)
+- API docs: local copies in `docs/`, online at https://nordicid.github.io/nur_nurapi_typescript/

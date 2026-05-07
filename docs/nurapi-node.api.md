@@ -1,7 +1,7 @@
 # @nordicid/nurapi-node — API Reference
 
-> Generated: 2026-05-06 07:35:25 UTC  
-> Package version: `0.9.4`  
+> Generated: 2026-05-07 14:53:30 UTC  
+> Package version: `0.9.7`  
 > Source: TypeDoc
 
 Node.js transports for the `@nordicid/nurapi` library — serial port (`serialport`) and TCP socket.
@@ -154,6 +154,52 @@ The default TCP port **4333** is used if the SRV record does not specify a port.
 ## API Reference
 
 ### @nordicid/nurapi-node
+
+Node.js transports for the [`@nordicid/nurapi`](https://www.npmjs.com/package/@nordicid/nurapi) library — serial port and TCP socket.
+
+#### Install
+
+```bash
+npm install @nordicid/nurapi @nordicid/nurapi-node
+```
+
+#### Quick Start
+
+Import the package to register `ser://` and `tcp://` URI schemes automatically:
+
+```typescript
+import '@nordicid/nurapi-node';
+import { NurApi } from '@nordicid/nurapi';
+
+const reader = new NurApi();
+await reader.connect('ser:///dev/ttyUSB0');    // Linux serial
+// await reader.connect('ser://COM3');          // Windows serial
+// await reader.connect('tcp://192.168.1.100'); // TCP (default port 4333)
+```
+
+#### Transport Registration
+
+| Scheme | Transport | Discovery |
+|---|---|---|
+| `ser://` | Serial port (`serialport`) | USB VID/PID enumeration |
+| `tcp://` | TCP socket (`net.Socket`) | mDNS (`_nur._tcp.local`) |
+
+#### Dependencies
+
+| Package | Purpose |
+|---|---|
+| `serialport` (≥13.0) | Serial port I/O and enumeration |
+| `multicast-dns` (≥7.2) | mDNS device discovery for TCP readers |
+
+Node.js **18.17+** required.
+
+#### Documentation
+
+See the full API reference and guides at [nordicid.github.io/nur_nurapi_typescript](https://nordicid.github.io/nur_nurapi_typescript/).
+
+#### License
+
+See [LICENSE](https://nordicid.github.io/nur_nurapi_typescript/LICENSE).
 
 #### Transport
 

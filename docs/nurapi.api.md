@@ -1,7 +1,7 @@
 # @nordicid/nurapi — API Reference
 
-> Generated: 2026-05-06 07:35:25 UTC  
-> Package version: `0.9.4`  
+> Generated: 2026-05-07 14:53:30 UTC  
+> Package version: `0.9.7`  
 > Source: TypeDoc + hand-written articles
 
 Single-file reference for the `@nordicid/nurapi` TypeScript library. The Guide section covers common workflows with examples; the API Reference section enumerates every public type and member. Headings are predictable and greppable — search for `Class \`X\``, `Function \`Y\``, etc.
@@ -21,8 +21,7 @@ section enumerates every public type and member.
 
 ### Packages
 
-The library ships as three packages. Pick the platform packages you need
-alongside the core:
+The library ships as three packages, available on [npmjs.com](https://www.npmjs.com/package/@nordicid/nurapi). Pick the platform packages you need alongside the core:
 
 | Package | Provides |
 |---|---|
@@ -32,9 +31,9 @@ alongside the core:
 
 | Environment | Install |
 |---|---|
-| Node.js (serial port, TCP) | `@nordicid/nurapi` + `@nordicid/nurapi-node` |
-| Browser (Web Serial, Web Bluetooth) | `@nordicid/nurapi` + `@nordicid/nurapi-web` |
-| WebSocket only (any environment, zero native deps) | `@nordicid/nurapi` |
+| Node.js (serial port, TCP) | `npm install @nordicid/nurapi @nordicid/nurapi-node` |
+| Browser (Web Serial, Web Bluetooth) | `npm install @nordicid/nurapi @nordicid/nurapi-web` |
+| WebSocket only (any environment, zero native deps) | `npm install @nordicid/nurapi` |
 
 Platform transport packages register URI schemes as side effects on import — no
 manual setup required:
@@ -1133,7 +1132,7 @@ Nordic ID handheld readers (EXA21, EXA31, EXA51, EXA81) have accessory
 features beyond RFID: battery monitoring, barcode scanning, LED / beep /
 vibration feedback, BLE pairing, sensors, and wireless charging. These
 methods are exposed by the `NurAccessoryExt` class, which wraps a `NurApi`
-instance. The reader is typically connected via `ble://` or `usb://`.
+instance. The reader is typically connected via `ble://` or `ser://`.
 
 ### Setup
 
@@ -13083,6 +13082,414 @@ Config device capability flags (AccConfig.config field).
 
 > `const` **ACC\_FL\_HID\_USB**: `number`
 
+
+***
+
+#### NurFirmwareExt
+
+
+Firmware programming extension for NUR modules.
+
+Provides low-level flash page read/write and high-level firmware
+programming orchestration (application and bootloader).
+
+Follows the composition pattern used by `NurGen2v2` and `NurAccessoryExt`.
+
+##### Constructors
+
+###### Constructor
+
+> **new NurFirmwareExt**(`api`): [`NurFirmwareExt`](#nurfirmwareext)
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| api | [`NurApi`](#nurapi) |  |
+
+**Returns** [`NurFirmwareExt`](#nurfirmwareext)
+
+##### Methods
+
+###### getDeviceFwInfo()
+
+> **getDeviceFwInfo**(): `Promise`\<[`FwInfo`](#fwinfo)\>
+
+
+Get parsed FWINFO from the connected device.
+
+Sends `NurCmd.GETFWINFO` (0x1E) and parses the response.
+The device always reports a single module in the MODULE field.
+
+**Returns** `Promise`\<[`FwInfo`](#fwinfo)\> — Parsed firmware info from the connected module
+
+###### enterBootloader()
+
+> **enterBootloader**(): `Promise`\<`void`\>
+
+
+Enter bootloader mode.
+
+The module will reset into bootloader and the connection will drop.
+Reconnect before issuing page write / validate commands.
+
+**Returns** `Promise`\<`void`\>
+
+###### pageRead()
+
+> **pageRead**(`pageNum`): `Promise`\<[`PageReadResult`](#pagereadresult)\>
+
+
+Read a single flash page.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| pageNum | `number` | Page number to read |
+
+**Returns** `Promise`\<[`PageReadResult`](#pagereadresult)\> — Page data with page number and address
+
+###### pageWrite()
+
+> **pageWrite**(`pageNum`, `pageData`): `Promise`\<`void`\>
+
+
+Write a single flash page.
+
+Data is padded to 256 bytes with 0xFF, CRC32 computed, then
+each 4-byte DWORD is XOR-encoded with the CRC before sending.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| pageNum | `number` | Page number to write |
+| pageData | `Uint8Array` | Page data (up to 256 bytes, padded if shorter) |
+
+**Returns** `Promise`\<`void`\>
+
+###### appValidate()
+
+> **appValidate**(`size`, `crc`): `Promise`\<`void`\>
+
+
+Validate the application firmware after programming.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| size | `number` | Total firmware size in bytes |
+| crc | `number` | CRC32 of the entire firmware buffer |
+
+**Returns** `Promise`\<`void`\>
+
+###### blValidate()
+
+> **blValidate**(`size`, `crc`): `Promise`\<`void`\>
+
+
+Validate the bootloader firmware after programming.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| size | `number` | Total firmware size in bytes |
+| crc | `number` | CRC32 of the entire firmware buffer |
+
+**Returns** `Promise`\<`void`\>
+
+###### programApp()
+
+> **programApp**(`buffer`, `options?`): `Promise`\<`void`\>
+
+
+Program application firmware from a raw binary buffer.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| buffer | `Uint8Array` | Firmware binary data |
+| options? | [`ProgramOptions`](#programoptions) | Programming options (progress callback, verify flag) |
+
+**Returns** `Promise`\<`void`\>
+
+###### programBootloader()
+
+> **programBootloader**(`buffer`, `options?`): `Promise`\<`void`\>
+
+
+Program bootloader firmware from a raw binary buffer.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| buffer | `Uint8Array` | Firmware binary data |
+| options? | [`ProgramOptions`](#programoptions) | Programming options (progress callback, verify flag) |
+
+**Returns** `Promise`\<`void`\>
+
+***
+
+#### NUR\_APP\_FIRST\_PAGE
+
+> `const` **NUR\_APP\_FIRST\_PAGE**: `number`
+
+
+First flash page of the application area (64KB / 256 = 256).
+
+***
+
+#### NUR\_BL\_FIRST\_PAGE
+
+> `const` **NUR\_BL\_FIRST\_PAGE**: `0` = `0`
+
+
+First flash page of the bootloader area.
+
+***
+
+#### NUR\_PROGRAM\_RETRIES
+
+> `const` **NUR\_PROGRAM\_RETRIES**: `5` = `5`
+
+
+Maximum retries for page write and validation commands.
+
+***
+
+#### FirmwareProgress
+
+
+Progress information reported during firmware programming.
+
+##### Properties
+
+###### currentPage
+
+> **currentPage**: `number`
+
+
+###### totalPages
+
+> **totalPages**: `number`
+
+
+###### error?
+
+> `optional` **error?**: `number`
+
+
+***
+
+#### ProgramOptions
+
+
+Options for firmware programming operations.
+
+##### Properties
+
+###### onProgress?
+
+> `optional` **onProgress?**: (`progress`) => `void`
+
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| progress | [`FirmwareProgress`](#firmwareprogress) |  |
+
+**Returns** `void`
+
+###### verify?
+
+> `optional` **verify?**: `boolean`
+
+
+###### skipVerification?
+
+> `optional` **skipVerification?**: `boolean`
+
+
+Skip FWINFO compatibility verification before programming.
+
+***
+
+#### PageReadResult
+
+
+Result of a flash page read operation.
+
+##### Properties
+
+###### pageNum
+
+> **pageNum**: `number`
+
+
+###### pageAddr
+
+> **pageAddr**: `number`
+
+
+###### data
+
+> **data**: `Uint8Array`
+
+
+***
+
+#### FwType
+
+> **FwType** = `"APP"` \| `"LOADER"` \| `"SEC_CHIP_APP"`
+
+
+Firmware type identifiers from the FWINFO TYPE field.
+
+***
+
+#### FwInfo
+
+
+Parsed FWINFO structure.
+
+Embedded in firmware binaries as `<FWINFO>MODULE=...;TYPE=...;VER=...;DATE=...</FWINFO>`
+and returned by the NUR module via `NurCmd.GETFWINFO` (0x1E).
+
+The MODULE field in a binary file may list multiple compatible modules
+(e.g. `NUR-05WL2,NUR-10W`), while a connected device always reports
+only the single module it actually is.
+
+##### Properties
+
+###### modules
+
+> **modules**: `string`[]
+
+
+Compatible module names (e.g. `["NUR-05WL2", "NUR-10W"]`).
+
+###### type
+
+> **type**: [`FwType`](#fwtype)
+
+
+Firmware type (`APP`, `LOADER`, or `SEC_CHIP_APP`).
+
+###### version
+
+> **version**: `string`
+
+
+Version string (e.g. `"5.15-A"` or `"3.3.3.0"`).
+
+###### date?
+
+> `optional` **date?**: `string`
+
+
+Build date string (e.g. `"Mar 14 2019 09:09:01"`), if present.
+
+###### raw
+
+> **raw**: `string`
+
+
+Original raw FWINFO string (inner content without `<FWINFO>` tags).
+
+***
+
+#### parseFwInfoString()
+
+> **parseFwInfoString**(`fwinfo`): [`FwInfo`](#fwinfo)
+
+
+Parse the inner content of a FWINFO string into structured fields.
+
+Accepts either the raw inner content (`MODULE=...;TYPE=...;VER=...`)
+or the full tagged string (`<FWINFO>...</FWINFO>`).
+
+##### Parameters
+
+###### fwinfo
+
+`string`
+
+FWINFO string (with or without `<FWINFO>` tags)
+
+**Returns** [`FwInfo`](#fwinfo) — Parsed firmware info
+
+**Throws** Error if MODULE, TYPE, or VER fields are missing
+
+***
+
+#### extractFwInfo()
+
+> **extractFwInfo**(`buffer`): [`FwInfo`](#fwinfo) \| `null`
+
+
+Extract and parse FWINFO from a firmware binary buffer.
+
+Scans the binary for `<FWINFO>...</FWINFO>` markers and parses the content.
+
+##### Parameters
+
+###### buffer
+
+`Uint8Array`
+
+Raw firmware binary data
+
+**Returns** [`FwInfo`](#fwinfo) \| `null` — Parsed firmware info, or `null` if no FWINFO is found
+
+***
+
+#### parseFwVersion()
+
+> **parseFwVersion**(`ver`): `number`[]
+
+
+Parse a firmware version string into a numeric array for comparison.
+
+Handles formats like `"5.15-A"` → `[5, 15, 65]` and `"3.3.3.0"` → `[3, 3, 3, 0]`.
+Letter components are converted to their ASCII char code.
+
+##### Parameters
+
+###### ver
+
+`string`
+
+Version string (e.g. `"5.15-A"`, `"7.4-A"`, `"3.3.3.0"`)
+
+**Returns** `number`[] — Array of numeric version components
+
+***
+
+#### compareFwVersion()
+
+> **compareFwVersion**(`a`, `b`): `number`
+
+
+Compare two parsed firmware version arrays.
+
+##### Parameters
+
+###### a
+
+`number`[]
+
+###### b
+
+`number`[]
+
+**Returns** `number` — `-1` if a < b, `0` if equal, `1` if a > b
 
 ***
 

@@ -40,13 +40,13 @@ npm run demo:node
 The API packages and full documentation are published at:\
 **https://nordicid.github.io/nur_nurapi_typescript/**
 
-Local copies of the API reference are included in [`nurapi/`](nurapi/) for offline use and AI assistant integration:
+Local copies of the API reference are included in [`docs/`](docs/) for offline use and AI assistant integration:
 
 | File | Contents |
 |---|---|
-| [`nurapi.api.md`](nurapi/nurapi.api.md) | Core API — `NurApi` class, types, enums, events |
-| [`nurapi-web.api.md`](nurapi/nurapi-web.api.md) | Browser transports — Web Serial, Web Bluetooth |
-| [`nurapi-node.api.md`](nurapi/nurapi-node.api.md) | Node.js transports — serialport, TCP |
+| [`nurapi.api.md`](docs/nurapi.api.md) | Core API — `NurApi` class, types, enums, events |
+| [`nurapi-web.api.md`](docs/nurapi-web.api.md) | Browser transports — Web Serial, Web Bluetooth |
+| [`nurapi-node.api.md`](docs/nurapi-node.api.md) | Node.js transports — serialport, TCP |
 
 ### Key Concepts
 
@@ -73,7 +73,7 @@ Use the [update-nurapi](.github/prompts/update-nurapi.prompt.md) prompt to upgra
 ## Project Structure
 
 ```
-nurapi/                  ← NurApi packages (.tgz) and API docs (.api.md)
+docs/                    ← NurApi API docs (.api.md)
 packages/
   example-web/           ← Browser sample (Vite + vanilla TypeScript)
     src/

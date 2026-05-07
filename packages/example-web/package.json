@@ -1,7 +1,7 @@
 {
   "name": "@nordicid/example-web",
   "private": true,
-  "version": "0.9.4",
+  "version": "0.9.7",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -9,8 +9,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@nordicid/nurapi": "file:../../nurapi/nordicid-nurapi-0.9.4.tgz",
-    "@nordicid/nurapi-web": "file:../../nurapi/nordicid-nurapi-web-0.9.4.tgz"
+    "@nordicid/nurapi": "latest",
+    "@nordicid/nurapi-web": "latest"
   },
   "devDependencies": {
     "typescript": "^5.5.0",
