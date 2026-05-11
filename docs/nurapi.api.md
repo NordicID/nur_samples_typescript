@@ -1,7 +1,7 @@
 # @nordicid/nurapi — API Reference
 
-> Generated: 2026-05-07 14:53:30 UTC  
-> Package version: `0.9.7`  
+> Generated: 2026-05-11 18:30:18 UTC  
+> Package version: `0.9.8`  
 > Source: TypeDoc + hand-written articles
 
 Single-file reference for the `@nordicid/nurapi` TypeScript library. The Guide section covers common workflows with examples; the API Reference section enumerates every public type and member. Headings are predictable and greppable — search for `Class \`X\``, `Function \`Y\``, etc.
@@ -21,19 +21,21 @@ section enumerates every public type and member.
 
 ### Packages
 
-The library ships as three packages, available on [npmjs.com](https://www.npmjs.com/package/@nordicid/nurapi). Pick the platform packages you need alongside the core:
+The library ships as four packages, available on [npmjs.com](https://www.npmjs.com/package/@nordicid/nurapi). Pick the platform packages you need alongside the core:
 
 | Package | Provides |
 |---|---|
 | `@nordicid/nurapi` | Core library: protocol engine, command API, typed events, WebSocket transport. |
 | `@nordicid/nurapi-web` | Browser transports: Web Serial (`ser://`), Web Bluetooth (`ble://`). |
 | `@nordicid/nurapi-node` | Node.js transports: serial port (`ser://`), TCP socket (`tcp://`). |
+| `@nordicid/nurapi-update` | Firmware update orchestration: ZIP parsing, McuMgr/SMP, NUR + EXA update flow. |
 
 | Environment | Install |
 |---|---|
 | Node.js (serial port, TCP) | `npm install @nordicid/nurapi @nordicid/nurapi-node` |
 | Browser (Web Serial, Web Bluetooth) | `npm install @nordicid/nurapi @nordicid/nurapi-web` |
 | WebSocket only (any environment, zero native deps) | `npm install @nordicid/nurapi` |
+| Firmware updates | `npm install @nordicid/nurapi-update` (alongside a transport package) |
 
 Platform transport packages register URI schemes as side effects on import — no
 manual setup required:
@@ -42,6 +44,9 @@ manual setup required:
 import '@nordicid/nurapi-node'; // registers ser:// and tcp://
 import '@nordicid/nurapi-web';  // registers ser:// and ble:// (browser)
 ```
+
+`@nordicid/nurapi-update` is transport-agnostic — it uses whatever transport
+package(s) are registered for the connection URI.
 
 ### Capabilities at a glance
 
@@ -7420,6 +7425,71 @@ Send binary data to the reader module.
 
 **Throws** Error if not connected or write fails
 
+###### canReuse()?
+
+> `optional` **canReuse**(`uri`): `boolean`
+
+
+Optional: report whether this transport instance can reconnect to the
+device described by `uri` without re-acquiring it (e.g. without a fresh
+user gesture in browser transports).
+
+Implementations should return `true` only when the transport currently
+holds a device handle that matches `uri` and is **not currently
+connected** — i.e. `reconnect()` would do useful work. Always-connected
+transports and `*://request`-style URIs (which mean "show a fresh
+picker") should return `false`.
+
+If omitted or returning `false`, the connection layer falls back to
+the regular tear-down + `connect()` path.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| uri | `URL` |  |
+
+**Returns** `boolean`
+
+###### reconnect()?
+
+> `optional` **reconnect**(`uri`): `Promise`\<`void`\>
+
+
+Optional: reconnect to the device whose handle this transport already
+holds, without going through the full `connect()` flow.
+
+Only invoked by the connection layer when `canReuse(uri)` returned
+true. Used by browser transports to reopen a previously-picked
+`SerialPort` / re-attach to a previously-paired `BluetoothDevice`
+without prompting the user.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| uri | `URL` |  |
+
+**Returns** `Promise`\<`void`\>
+
+###### getReconnectUri()?
+
+> `optional` **getReconnectUri**(): `string` \| `null`
+
+
+Optional: after a successful `connect()` (or `reconnect()`), return a
+URI that the caller can later pass to `connect()` to reach the same
+device without a user gesture.
+
+For URI schemes that are already addressable (e.g. `tcp://host:port`
+or `ser://COM3`), return `null` (or omit this method entirely) — the
+original URI already serves as the reconnect URI.
+
+The connection layer overwrites its stored `lastConnectUri` with the
+value returned here, so subsequent reconnect attempts use this form.
+
+**Returns** `string` \| `null`
+
 ##### Properties
 
 ###### connected
@@ -7444,6 +7514,24 @@ Set by the consumer (e.g., NurApi) before calling `connect()`.
 
 Callback invoked when the transport disconnects unexpectedly.
 Not called on explicit `disconnect()` — only on unplanned disconnection.
+
+###### onLog?
+
+> `optional` **onLog?**: ((`level`, `message`, `context?`) => `void`) \| `null`
+
+
+Optional: callback invoked for diagnostic log messages emitted by the
+transport (URI parsing, picker invocations, GATT/serial open attempts,
+retries, disconnect events, etc.).
+
+Set by the connection layer to bridge transport-level messages into
+NurApi's `'log'` event stream — they appear with a `[<type>]` prefix
+(e.g. `[bluetooth] picked device`) so the source is obvious.
+
+If null (the default), the transport silently skips logging. Transports
+SHOULD use this for verbose tracing of operations that are otherwise
+invisible to the consumer (especially browser transports, where DevTools
+is the only way to debug a live session).
 
 ###### type
 

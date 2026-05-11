@@ -1,7 +1,7 @@
 # @nordicid/nurapi-web — API Reference
 
-> Generated: 2026-05-07 14:53:30 UTC  
-> Package version: `0.9.7`  
+> Generated: 2026-05-11 18:30:18 UTC  
+> Package version: `0.9.8`  
 > Source: TypeDoc
 
 Browser transports for the `@nordicid/nurapi` library — Web Serial and Web Bluetooth.
@@ -296,6 +296,54 @@ the reader's BLE stack is not ready immediately after accepting a connection.
 
 **Returns** `Promise`\<`void`\>
 
+###### reconnect()
+
+> **reconnect**(`_uri`): `Promise`\<`void`\>
+
+
+Reconnect to the device this transport already holds, without a user
+gesture. Called by the connection layer's fast path after `canReuse()`
+returned true.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| \_uri | `URL` |  |
+
+**Returns** `Promise`\<`void`\>
+
+###### canReuse()
+
+> **canReuse**(`uri`): `boolean`
+
+
+Whether this transport instance can reconnect via `reconnect()` for the
+given URI without a fresh user gesture.
+
+True only when:
+- The URI targets the device this transport already holds (matched by
+  the `id/<BluetoothDevice.id>` form, or by name prefix).
+- We are not already connected.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| uri | `URL` |  |
+
+**Returns** `boolean`
+
+###### getReconnectUri()
+
+> **getReconnectUri**(): `string` \| `null`
+
+
+After a successful connect, return a URI that reaches this same device
+on subsequent reconnects without a user gesture.
+
+**Returns** `string` \| `null`
+
 ###### disconnect()
 
 > **disconnect**(): `Promise`\<`void`\>
@@ -356,6 +404,13 @@ Callback for received data
 
 
 Callback for unexpected disconnection
+
+###### onLog
+
+> **onLog**: ((`level`, `message`, `context?`) => `void`) \| `null` = `null`
+
+
+Diagnostic log callback — wired by the connection layer.
 
 ***
 
@@ -419,16 +474,72 @@ Baud rate can be specified via ?baudrate= query parameter (default 115200).
 
 | Name | Type | Description |
 | --- | --- | --- |
-| uri | `URL` | Serial URI (ser://request?baudrate=115200) |
+| uri | `URL` | Serial URI (`ser://request?baudrate=115200`). The `current` form is reserved for the connection layer's fast-path reconnect and must not be passed to a fresh transport instance — it cannot acquire a port without a user gesture. |
 
 **Returns** `Promise`\<`void`\>
+
+###### reconnect()
+
+> **reconnect**(`_uri`): `Promise`\<`void`\>
+
+
+Reopen the previously-picked SerialPort without a user gesture.
+Called by the connection layer's fast path after `canReuse()` returned true.
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| \_uri | `URL` |  |
+
+**Returns** `Promise`\<`void`\>
+
+###### canReuse()
+
+> **canReuse**(`uri`): `boolean`
+
+
+Whether this transport instance can reconnect via `reconnect()` for the
+given URI without a fresh user gesture.
+
+True only when:
+- The URI is `ser://current` (the canonical reconnect form).
+- We currently hold a SerialPort handle.
+- We are not already connected (otherwise reconnect would call
+  port.open() on an open port and throw).
+
+**Parameters**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| uri | `URL` |  |
+
+**Returns** `boolean`
+
+###### getReconnectUri()
+
+> **getReconnectUri**(): `string`
+
+
+After a successful connect, return the URI that reaches this same
+device on subsequent reconnects without a user gesture. Web Serial
+has no per-port stable ID, so the URI is opaque ("current") and
+meaningful only against this transport instance.
+
+**Returns** `string`
 
 ###### disconnect()
 
 > **disconnect**(): `Promise`\<`void`\>
 
 
-Disconnect from the serial port.
+Disconnect from the serial port. Called by the connection layer when
+it explicitly tears down (api.disconnect, switching to a different
+URI, or after a fast-path reconnect attempt failed).
+
+**Releases the held SerialPort.** The unexpected `'disconnect'` DOM
+event has its own handler that does NOT release the port, so a brief
+device reset preserves the handle for `reconnect()`.
 
 **Returns** `Promise`\<`void`\>
 
@@ -482,3 +593,10 @@ Callback for received data
 
 
 Callback for unexpected disconnection
+
+###### onLog
+
+> **onLog**: ((`level`, `message`, `context?`) => `void`) \| `null` = `null`
+
+
+Diagnostic log callback — wired by the connection layer.
