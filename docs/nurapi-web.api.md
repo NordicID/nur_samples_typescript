@@ -1,7 +1,7 @@
 # @nordicid/nurapi-web — API Reference
 
-> Generated: 2026-05-11 18:30:18 UTC  
-> Package version: `0.9.8`  
+> Generated: 2026-05-15 05:45:37 UTC  
+> Package version: `0.9.9`  
 > Source: TypeDoc
 
 Browser transports for the `@nordicid/nurapi` library — Web Serial and Web Bluetooth.
@@ -122,7 +122,7 @@ The transport uses the **Nordic UART Service (NUS)**:
 | RX (device receives) | `6e400002-b5a3-f393-e0a9-e50e24dcca9e` | Host → Reader |
 | TX (device transmits) | `6e400003-b5a3-f393-e0a9-e50e24dcca9e` | Reader → Host |
 
-Write operations are automatically chunked to the BLE MTU size (200 bytes by default).
+Write operations are automatically chunked to the BLE MTU size (20 bytes by default — the conservative ATT_MTU 23 − 3 header size, compatible with peripherals that never initiate MTU exchange).
 
 ### GATT connection resilience
 

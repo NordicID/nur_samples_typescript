@@ -1,7 +1,7 @@
 # @nordicid/nurapi-node — API Reference
 
-> Generated: 2026-05-11 18:30:18 UTC  
-> Package version: `0.9.8`  
+> Generated: 2026-05-15 05:45:37 UTC  
+> Package version: `0.9.9`  
 > Source: TypeDoc
 
 Node.js transports for the `@nordicid/nurapi` library — serial port (`serialport`) and TCP socket.

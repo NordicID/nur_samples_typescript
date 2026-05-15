@@ -1,7 +1,7 @@
 # @nordicid/nurapi — API Reference
 
-> Generated: 2026-05-11 18:30:18 UTC  
-> Package version: `0.9.8`  
+> Generated: 2026-05-15 05:45:37 UTC  
+> Package version: `0.9.9`  
 > Source: TypeDoc + hand-written articles
 
 Single-file reference for the `@nordicid/nurapi` TypeScript library. The Guide section covers common workflows with examples; the API Reference section enumerates every public type and member. Headings are predictable and greppable — search for `Class \`X\``, `Function \`Y\``, etc.
